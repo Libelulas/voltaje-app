@@ -4,9 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora de Voltaje Promedio</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#3a6fd8" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    *, ::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
@@ -87,29 +99,30 @@
   <div class="divider"></div>
   <div class="field-group">
     <div class="field">
-      <label>Voltaje M&#225;ximo <span class="badge">V</span></label>
+      <label>Voltaje Máximo <span class="badge">V</span></label>
       <input type="number" id="vmax" placeholder="0.00 – 500.00" min="0" max="500" step="any" oninput="calcular()" />
       <span class="error-hint" id="err-vmax">Valor fuera de rango (0 – 500)</span>
     </div>
     <div class="field">
-      <label>Voltaje M&#237;nimo <span class="badge">V</span></label>
+      <label>Voltaje Mínimo <span class="badge">V</span></label>
       <input type="number" id="vmin" placeholder="0.00 – 500.00" min="0" max="500" step="any" oninput="calcular()" />
       <span class="error-hint" id="err-vmin">Valor fuera de rango (0 – 500)</span>
     </div>
     <div class="separator">
-      <span class="sep-line"></span><span class="eq">&#8721; / 2</span><span class="sep-line"></span>
+      <span class="sep-line"></span><span class="eq">∑ / 2</span><span class="sep-line"></span>
     </div>
     <div class="field">
       <div class="result-label-row">
         <label>Promedio (Average) <span class="badge">V</span></label>
-        <span class="formula">(Vm&#225;x + Vm&#237;n) &#247; 2</span>
+        <span class="formula">(Vmáx + Vmín) ÷ 2</span>
       </div>
-      <input type="text" id="avg" class="result-field" placeholder="&#8212;" readonly />
+      <input type="text" id="avg" class="result-field" placeholder="—" readonly />
     </div>
   </div>
-  <button class="btn-clear" onclick="limpiar()">&#x2715;&nbsp;&nbsp;Clear</button>
-  <p class="footer-note">Rango aceptado: 0 V &#8212; 500 V</p>
+  <button class="btn-clear" onclick="limpiar()">✕&nbsp;&nbsp;Clear</button>
+  <p class="footer-note">Rango aceptado: 0 V — 500 V</p>
 </div>
+
 <script>
   function calcular() {
     var vmaxEl = document.getElementById('vmax');
@@ -117,15 +130,19 @@
     var avgEl  = document.getElementById('avg');
     var errMax = document.getElementById('err-vmax');
     var errMin = document.getElementById('err-vmin');
+
     var vmax = parseFloat(vmaxEl.value);
     var vmin = parseFloat(vminEl.value);
     var maxOk = true, minOk = true;
+
     if (vmaxEl.value !== '' && (isNaN(vmax) || vmax < 0 || vmax > 500)) {
       errMax.classList.add('visible'); maxOk = false;
     } else { errMax.classList.remove('visible'); }
+
     if (vminEl.value !== '' && (isNaN(vmin) || vmin < 0 || vmin > 500)) {
       errMin.classList.add('visible'); minOk = false;
     } else { errMin.classList.remove('visible'); }
+
     if (vmaxEl.value !== '' && vminEl.value !== '' && maxOk && minOk) {
       var avg = (vmax + vmin) / 2;
       avgEl.value = avg.toFixed(2) + ' V';
@@ -133,6 +150,7 @@
       avgEl.value = '';
     }
   }
+
   function limpiar() {
     document.getElementById('vmax').value = '';
     document.getElementById('vmin').value = '';
