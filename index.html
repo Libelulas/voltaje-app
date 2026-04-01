@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora de Voltaje Promedio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #0d0f1a 0%, #1a1e2e 40%, #0f1922 70%, #0a0e18 100%);
+      font-family: 'Inter', sans-serif; color: #e0e6f0;
+    }
+    .card {
+      width: 100%; max-width: 336px;
+      background: linear-gradient(160deg, rgba(30,36,58,0.95) 0%, rgba(18,24,42,0.98) 100%);
+      border: 1px solid rgba(100,140,200,0.15); border-radius: 20px;
+      padding: 44px 40px 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset;
+    }
+    .header { text-align: center; margin-bottom: 36px; }
+    .header .icon {
+      width: 52px; height: 52px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, #3a6fd8 0%, #1e3a7a 100%);
+      border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(58,111,216,0.35);
+    }
+    .header .icon svg {
+      width: 26px; height: 26px; fill: none; stroke: #a8c4f8;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .header h1 { font-size: 1.35rem; font-weight: 600; letter-spacing: 0.02em; color: #cdd8f0; margin-bottom: 6px; }
+    .header p { font-size: 0.8rem; color: #5a6a8a; letter-spacing: 0.04em; text-transform: uppercase; }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(80,120,200,0.25), transparent); margin-bottom: 30px; }
+    .field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 24px; }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #6a80aa; }
+    .badge { display: inline-block; font-size: 0.62rem; background: rgba(58,111,216,0.15); color: #5a8ad8; padding: 2px 7px; border-radius: 20px; margin-left: 6px; vertical-align: middle; font-weight: 500; }
+    .field input {
+      width: 100%; padding: 9px 16px;
+      background: linear-gradient(135deg, rgba(15,20,38,0.85) 0%, rgba(10,14,28,0.9) 100%);
+      border: 1px solid rgba(70,100,170,0.2); border-radius: 10px;
+      color: #d8e4f8; font-size: 1.15rem; font-family: 'Inter', sans-serif;
+      text-align: center; outline: none; transition: border-color 0.25s, box-shadow 0.25s;
+      -moz-appearance: textfield;
+    }
+    .field input::-webkit-outer-spin-button,
+    .field input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .field input:focus { border-color: rgba(80,130,220,0.55); box-shadow: 0 0 0 3px rgba(58,111,216,0.12); }
+    .field input::placeholder { color: rgba(90,110,150,0.5); font-size: 0.9rem; }
+    .result-field {
+      background: linear-gradient(135deg, rgba(30,55,110,0.3) 0%, rgba(18,35,80,0.4) 100%) !important;
+      border-color: rgba(58,111,216,0.3) !important;
+      color: #7ab0f8 !important; font-weight: 600 !important;
+      font-size: 1.3rem !important; cursor: default !important;
+    }
+    .result-label-row { display: flex; align-items: center; justify-content: space-between; }
+    .formula { font-size: 0.58rem; color: rgba(90,110,160,0.6); font-style: italic; }
+    .separator { display: flex; align-items: center; gap: 12px; margin: 4px 0; }
+    .sep-line { height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(60,90,160,0.2), transparent); }
+    .eq { font-size: 0.7rem; color: rgba(80,110,170,0.4); letter-spacing: 0.1em; }
+    .btn-clear {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, rgba(40,50,80,0.7) 0%, rgba(25,32,60,0.8) 100%);
+      border: 1px solid rgba(70,100,170,0.2); border-radius: 10px;
+      color: #8898c0; font-size: 0.82rem; font-family: 'Inter', sans-serif; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.22s; margin-top: 6px;
+    }
+    .btn-clear:hover { background: linear-gradient(135deg, rgba(55,68,110,0.75) 0%, rgba(35,44,80,0.85) 100%); border-color: rgba(90,130,210,0.35); color: #aabce0; }
+    .btn-clear:active { transform: scale(0.98); }
+    .footer-note { text-align: center; margin-top: 22px; font-size: 0.68rem; color: rgba(70,90,130,0.5); }
+    .error-hint { font-size: 0.68rem; color: #c05050; display: none; padding-left: 4px; }
+    .error-hint.visible { display: block; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    </div>
+    <h1>Voltaje Promedio</h1>
+    <p>Calculadora de Valor Medio</p>
+  </div>
+  <div class="divider"></div>
+  <div class="field-group">
+    <div class="field">
+      <label>Voltaje M&#225;ximo <span class="badge">V</span></label>
+      <input type="number" id="vmax" placeholder="0.00 – 500.00" min="0" max="500" step="any" oninput="calcular()" />
+      <span class="error-hint" id="err-vmax">Valor fuera de rango (0 – 500)</span>
+    </div>
+    <div class="field">
+      <label>Voltaje M&#237;nimo <span class="badge">V</span></label>
+      <input type="number" id="vmin" placeholder="0.00 – 500.00" min="0" max="500" step="any" oninput="calcular()" />
+      <span class="error-hint" id="err-vmin">Valor fuera de rango (0 – 500)</span>
+    </div>
+    <div class="separator">
+      <span class="sep-line"></span><span class="eq">&#8721; / 2</span><span class="sep-line"></span>
+    </div>
+    <div class="field">
+      <div class="result-label-row">
+        <label>Promedio (Average) <span class="badge">V</span></label>
+        <span class="formula">(Vm&#225;x + Vm&#237;n) &#247; 2</span>
+      </div>
+      <input type="text" id="avg" class="result-field" placeholder="&#8212;" readonly />
+    </div>
+  </div>
+  <button class="btn-clear" onclick="limpiar()">&#x2715;&nbsp;&nbsp;Clear</button>
+  <p class="footer-note">Rango aceptado: 0 V &#8212; 500 V</p>
+</div>
+<script>
+  function calcular() {
+    var vmaxEl = document.getElementById('vmax');
+    var vminEl = document.getElementById('vmin');
+    var avgEl  = document.getElementById('avg');
+    var errMax = document.getElementById('err-vmax');
+    var errMin = document.getElementById('err-vmin');
+    var vmax = parseFloat(vmaxEl.value);
+    var vmin = parseFloat(vminEl.value);
+    var maxOk = true, minOk = true;
+    if (vmaxEl.value !== '' && (isNaN(vmax) || vmax < 0 || vmax > 500)) {
+      errMax.classList.add('visible'); maxOk = false;
+    } else { errMax.classList.remove('visible'); }
+    if (vminEl.value !== '' && (isNaN(vmin) || vmin < 0 || vmin > 500)) {
+      errMin.classList.add('visible'); minOk = false;
+    } else { errMin.classList.remove('visible'); }
+    if (vmaxEl.value !== '' && vminEl.value !== '' && maxOk && minOk) {
+      var avg = (vmax + vmin) / 2;
+      avgEl.value = avg.toFixed(2) + ' V';
+    } else {
+      avgEl.value = '';
+    }
+  }
+  function limpiar() {
+    document.getElementById('vmax').value = '';
+    document.getElementById('vmin').value = '';
+    document.getElementById('avg').value  = '';
+    document.getElementById('err-vmax').classList.remove('visible');
+    document.getElementById('err-vmin').classList.remove('visible');
+  }
+</script>
+</body>
+</html>
