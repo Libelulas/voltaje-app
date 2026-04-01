@@ -2,7 +2,7 @@
   "name": "Calculadora de Voltaje Promedio",
   "short_name": "Voltaje",
   "description": "Calculadora de valor medio de voltaje",
-  "start_url": "/",
+  "start_url": "/voltaje-app/",
   "display": "standalone",
   "background_color": "#0d0f1a",
   "theme_color": "#3a6fd8",
